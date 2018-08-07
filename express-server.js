@@ -43,8 +43,10 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // debug statement to see POST parameters
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  var longURL = req.body.longURL;
+  var shortURL = generateRandomString();
+  urlDatabase[shortURL] = longURL;
+  res.redirect("http://localhost:8080/urls/" + shortURL);
 });
 
 app.listen(PORT, () => {
