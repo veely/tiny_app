@@ -49,6 +49,25 @@ app.post("/urls", (req, res) => {
   res.redirect("http://localhost:8080/urls/" + shortURL);
 });
 
+app.post("/urls/:id/delete", (req, res) => {
+  var shortURL = req.body.delete;
+  delete urlDatabase[shortURL];
+  res.redirect("http://localhost:8080/urls/");
+});
+
+app.post("/urls/:id", (req, res) => {
+  var shortURL = req.body.shortURL;
+  var longURL = req.body.longURL;
+  urlDatabase[shortURL] = longURL;
+  res.redirect("http://localhost:8080/urls/");
+});
+
+app.get("/u/:shortURL", (req, res) => {
+  let shortURL = req.params.shortURL;
+  let longURL = urlDatabase[shortURL];
+  res.redirect(longURL);
+});
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
