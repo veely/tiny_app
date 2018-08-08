@@ -1,6 +1,6 @@
-var express = require("express");
-var app = express();
-var PORT = 8080; // default port 8080
+const express = require("express");
+const app = express();
+const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 
 var urlDatabase = {
@@ -43,21 +43,26 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  var longURL = req.body.longURL;
-  var shortURL = generateRandomString();
+  let longURL = req.body.longURL;
+  let shortURL = generateRandomString();
   urlDatabase[shortURL] = longURL;
   res.redirect("http://localhost:8080/urls/" + shortURL);
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-  var shortURL = req.body.delete;
+  let shortURL = req.body.delete;
   delete urlDatabase[shortURL];
   res.redirect("http://localhost:8080/urls/");
 });
 
+app.post("/urls/:id/edit", (req, res) => {
+  let shortURL = req.body.edit;
+  res.redirect("http://localhost:8080/urls/" + shortURL);
+});
+
 app.post("/urls/:id", (req, res) => {
-  var shortURL = req.body.shortURL;
-  var longURL = req.body.longURL;
+  let shortURL = req.body.shortURL;
+  let longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
   res.redirect("http://localhost:8080/urls/");
 });

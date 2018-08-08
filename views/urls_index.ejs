@@ -7,13 +7,16 @@
 <body>
   <ul>
     <% for (key of Object.keys(urlDb)) { %>
-      <form method="POST" action="/urls/<%= key %>/delete">
         <li>
           http://localhost:8080/<%= key %> (<%= urlDb[key] %>)
-          <input type="hidden" id="delete" name="delete" value="<%= key %>">
-          <input type="submit" value="Delete">
+          <form method="POST" action="/urls/<%= key %>/edit">
+            <button type="submit" value="<%= key %>" name="edit" id="edit">EDIT</button>
+          </form>
+          <form method="POST" action="/urls/<%= key %>/delete">
+            <button type="submit" value="<%= key %>" name="delete" id="delete">DELETE</button>
+          </form>
         </li>
-      </form>
+
     <% }; %>
   </ul>
 </body>
