@@ -23,7 +23,7 @@ const users = {
   },
  "user2RandomID": {
     id: "user2RandomID",
-    email: "ihatebucks@coffee.com",
+    email: "ihatestarbucks@coffee.com",
     password: "dishwasher-funk"
   }
 }
@@ -93,11 +93,14 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
+  shortURL = req.params.id;
+  longURL = urlDatabase[shortURL].url;
+
   let userID = req.cookies.user_id;
   let templateVars = {
     user: users[userID],
-    shortURL: req.params.id,
-    longURL: urlDatabase[req.params.id]
+    shortURL: shortURL,
+    longURL: longURL
   };
   res.render("urls_show", templateVars);
 });
@@ -108,23 +111,32 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
-app.post("/urls", (req, res) => {
+app.post("/urls/new", (req, res) => {
+  let userID = req.cookies.user_id;
   let longURL = req.body.longURL;
   let shortURL = generateRandomString();
-  urlDatabase[shortURL] = longURL;
+  urlDatabase[shortURL] = {};
+  urlDatabase[shortURL].url = longURL;
+  urlDatabase[shortURL].userID = userID;
   res.redirect("/urls/" + shortURL);
+
 });
 
 app.post("/urls/:id/delete", (req, res) => {
   let userID = req.cookies.user_id;
   let shortURL = req.body.delete;
-  if (urlDatabase[shortURL].id === userID){
+  console.log(userID);
+  console.log(shortURL);
+  if (urlDatabase[shortURL].userID === userID){
     delete urlDatabase[shortURL];
     res.redirect("/urls/");
+  } else {
+    res.sendStatus(403);
   }
 });
 
 app.post("/urls/:id/edit", (req, res) => {
+  let userID = req.cookies.user_id;
   let shortURL = req.body.edit;
   res.redirect("/urls/" + shortURL);
 });
@@ -132,7 +144,7 @@ app.post("/urls/:id/edit", (req, res) => {
 app.post("/urls/:id/update", (req, res) => {
   let shortURL = req.body.shortURL;
   let longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
+  urlDatabase[shortURL].url = longURL;
   res.redirect("/urls/");
 });
 

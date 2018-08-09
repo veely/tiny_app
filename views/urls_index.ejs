@@ -5,17 +5,21 @@
   <% include ./partials/_header %>
 </head>
 <body>
-  <ul>
-    <% for (key of Object.keys(urlDb)) { %>
-        <li>
-          http://localhost:8080/<%= key %> (<%= urlDb[key] %>)
-          <a href="/urls/<%= key %>">Edit</a>
-          <form method="POST" action="/urls/<%= key %>/delete">
-            <button type="submit" value="<%= key %>" name="delete" id="delete">DELETE</button>
-          </form>
-        </li>
-    <% }; %>
-  </ul>
+  <% if (user) { %>
+    <ul>
+      <% for (key of Object.keys(urlDb)) { %>
+        <% if (urlDb[key].userID === user.id) { %>
+          <li>
+            http://localhost:8080/<%= key %> (<%= urlDb[key].url %>)
+            <a href="/urls/<%= key %>">Edit</a>
+            <form method="POST" action="/urls/<%= key %>/delete">
+              <button type="submit" value="<%= key %>" name="delete" id="delete">DELETE</button>
+            </form>
+          </li>
+        <% } %>
+      <% }; %>
+    </ul>
+  <% } %>
   <a href="/urls/new">Create new tiny URL</a>
 </body>
 </html>
