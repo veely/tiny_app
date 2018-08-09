@@ -38,7 +38,7 @@ function checkExistingEmail(email) {
 function findUser(email) {
   for (user in users) {
     if (users[user].email === email) {
-      return users[user].id;
+      return users[user];
     }
   }
   return;
@@ -122,11 +122,12 @@ app.post("/urls/:id/update", (req, res) => {
 app.post("/login", (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
-  let found = findUser(email);
-  if (found) {
-    res.cookie("user_id", found);
+  let user = findUser(email);
+  if (user && user.password === password) {
+    res.cookie("user_id", user.id);
+    res.redirect("/urls");
   }
-  res.redirect("/urls");
+  res.end("Incorrect email/password!");
 });
 
 app.post("/logout", (req, res) => {
