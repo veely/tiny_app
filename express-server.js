@@ -129,8 +129,9 @@ app.post("/login", (req, res) => {
   if (user && user.password === password) {
     res.cookie("user_id", user.id);
     res.redirect("/urls");
+  } else {
+    res.sendStatus(403);
   }
-  res.end("Incorrect email/password!");
 });
 
 app.post("/logout", (req, res) => {
