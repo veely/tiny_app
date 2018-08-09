@@ -5,8 +5,14 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 
 var urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {
+    url: "http://www.lighthouselabs.ca",
+    userID: "coffeeman"
+  },
+  "9sm5xK": {
+    url: "http://www.google.com",
+    userID: "user2RandomID"
+  }
 };
 
 const users = {
@@ -75,10 +81,15 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = {
-    username: req.cookies["username"],
-  };
-  res.render("urls_new",templateVars);
+  let userID = req.cookies.user_id;
+  if (userID) {
+    let templateVars = {
+      user: users[userID]
+    };
+    res.render("urls_new",templateVars);
+  } else {
+    res.redirect("/login");
+  }
 });
 
 app.get("/urls/:id", (req, res) => {
@@ -105,9 +116,12 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/urls/:id/delete", (req, res) => {
+  let userID = req.cookies.user_id;
   let shortURL = req.body.delete;
-  delete urlDatabase[shortURL];
-  res.redirect("/urls/");
+  if (urlDatabase[shortURL].id === userID){
+    delete urlDatabase[shortURL];
+    res.redirect("/urls/");
+  }
 });
 
 app.post("/urls/:id/edit", (req, res) => {
