@@ -1,0 +1,21 @@
+<!-- views/partials/_header.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TinyApp</title>
+</head>
+<body>
+    <form method="POST" action="/login">
+      <div>
+        <label for="user_id">Email: </label>
+        <input type="text" name="email" id="email" placeholder="Email@email.com" style="width: 150px">
+      </div>
+      <div>
+        <label for="password">Password: </label>
+        <input type="password" name="password" id="password" placeholder="password" style="width: 150px">
+      </div>
+      <input type="submit" value="Login">
+    </form>
+</body>
+</html>

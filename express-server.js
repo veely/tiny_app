@@ -10,7 +10,7 @@ var urlDatabase = {
 };
 
 const users = {
-  "asdf123": {
+  "coffeeman": {
     id: "coffeeman",
     email: "ilovestarbucks@coffee.com",
     password: "ilovestarbucks"
@@ -26,6 +26,24 @@ function generateRandomString() {
   return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 }
 
+function checkExistingEmail(email) {
+  for (user in users) {
+    if (email === users[user].email) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function findUser(email) {
+  for (user in users) {
+    if (users[user].email === email) {
+      return users[user].id;
+    }
+  }
+  return;
+}
+
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -39,9 +57,14 @@ app.get("/register", (req, res) => {
   res.render('register');
 });
 
+app.get("/login", (req, res) => {
+  res.render('login');
+});
+
 app.get("/urls", (req, res) => {
+  let userID = req.cookies.user_id;
   let templateVars = {
-    username: req.cookies["username"],
+    user: users[userID],
     urlDb: urlDatabase
   };
   res.render('urls_index', templateVars);
@@ -56,8 +79,9 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
+  let userID = req.cookies.user_id;
   let templateVars = {
-    username: req.cookies["username"],
+    user: users[userID],
     shortURL: req.params.id,
     longURL: urlDatabase[req.params.id]
   };
@@ -96,33 +120,38 @@ app.post("/urls/:id/update", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username);
+  let email = req.body.email;
+  let password = req.body.password;
+  let found = findUser(email);
+  if (found) {
+    res.cookie("user_id", found);
+  }
   res.redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
 });
 
 app.post("/register", (req, res) => {
-  if (req.body.password && req.body.email) {
-    let userID = generateRandomString();
-    let username = req.body.username;
-    let email = req.body.email;
-    let password = req.body.password;
-    let passwordConfirm = req.body.password_confirm;
-    users[userID] = {
-      id: username,
-      email: email,
-      password: password
-    };
-    res.cookie("user_id", userID);
-    res.redirect("/urls");
-  } else {
+  let email = req.body.email;
+  let emailExists = checkExistingEmail(email);
+  if (emailExists || !(req.body.password && req.body.email)) {
     // res.status(400).send('400: Bad Request!');
     res.sendStatus(400);
   }
+  let userID = generateRandomString();
+  let password = req.body.password;
+  let passwordConfirm = req.body.password_confirm;
+  users[userID] = {
+    id: userID,
+    email: email,
+    password: password
+  };
+  res.cookie("user_id", userID);
+  res.redirect("/urls");
+
 });
 
 app.listen(PORT, () => {
