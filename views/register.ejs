@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Express Simple User Auth</title>
+</head>
+
+<body>
+  <h1>New user registration</h1>
+
+  <div>
+    <a href="/">Back</a>
+  </div>
+
+  <div>
+    Already have an account? You can <a href="/login">login here</a>
+  </div>
+
+
+  <form action="/register" method="POST">
+    <div>
+      <label for="username">Username:</label>
+      <input type="text" name="username" placeholder="Enter a Username" />
+    </div>
+
+    <div>
+      <label for="email">Email:</label>
+      <input type="text" name="email" placeholder="Enter your Email address" />
+    </div>
+
+    <div>
+      <label for="password">Password:</label>
+      <input type="password" name="password" placeholder="Enter a Password" />
+    </div>
+
+    <div>
+      <label for="password_confirm">Confirm password:</label>
+      <input type="password" name="password_confirm" placeholder="Enter your password again" />
+    </div>
+
+    <div>
+      <input type="submit" value="Register" />
+    </div>
+  </form>
+</body>
+
+</html>

@@ -9,6 +9,19 @@ var urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  "asdf123": {
+    id: "coffeeman",
+    email: "ilovestarbucks@coffee.com",
+    password: "ilovestarbucks"
+  },
+ "user2RandomID": {
+    id: "user2RandomID",
+    email: "ihatebucks@coffee.com",
+    password: "dishwasher-funk"
+  }
+}
+
 function generateRandomString() {
   return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 }
@@ -20,6 +33,10 @@ app.set("view engine", "ejs");
 
 app.get("/", (req, res) => {
   res.end("Hello!");
+});
+
+app.get("/register", (req, res) => {
+  res.render('register');
 });
 
 app.get("/urls", (req, res) => {
@@ -86,6 +103,26 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   res.clearCookie("username");
   res.redirect("/urls");
+});
+
+app.post("/register", (req, res) => {
+  if (req.body.password && req.body.email) {
+    let userID = generateRandomString();
+    let username = req.body.username;
+    let email = req.body.email;
+    let password = req.body.password;
+    let passwordConfirm = req.body.password_confirm;
+    users[userID] = {
+      id: username,
+      email: email,
+      password: password
+    };
+    res.cookie("user_id", userID);
+    res.redirect("/urls");
+  } else {
+    // res.status(400).send('400: Bad Request!');
+    res.sendStatus(400);
+  }
 });
 
 app.listen(PORT, () => {
