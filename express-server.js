@@ -50,6 +50,15 @@ function findUser(email) {
   return;
 }
 
+// function checkIfOwner(userID) {
+//   for (key in urlDatabase) {
+//     if (urlDatabase[key].userID === userID) {
+//       return true;
+//     }
+//   }
+//   return false;
+// }
+
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -93,21 +102,25 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  shortURL = req.params.id;
-  longURL = urlDatabase[shortURL].url;
-
   let userID = req.cookies.user_id;
-  let templateVars = {
-    user: users[userID],
-    shortURL: shortURL,
-    longURL: longURL
-  };
-  res.render("urls_show", templateVars);
+  shortURL = req.params.id;
+  if (userID && urlDatabase[shortURL].userID === userID) {
+    longURL = urlDatabase[shortURL].url;
+    let userID = req.cookies.user_id;
+    let templateVars = {
+      user: users[userID],
+      shortURL: shortURL,
+      longURL: longURL
+    };
+    res.render("urls_show", templateVars);
+  } else {
+    res.end("Either this URL doesn't belong to you, or you must log in!")
+  }
 });
 
 app.get("/u/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
-  let longURL = urlDatabase[shortURL];
+  let longURL = urlDatabase[shortURL].url;
   res.redirect(longURL);
 });
 
