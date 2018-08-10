@@ -80,8 +80,9 @@ app.get("/", (req, res) => {
 app.get("/register", (req, res) => {
   if (req.session.user_id) {
     res.redirect("/urls");
+  } else {
+    res.render('register');
   }
-  res.render('register');
 });
 
 app.get("/login", (req, res) => {
@@ -92,12 +93,13 @@ app.get("/urls", (req, res) => {
   let userID = req.session.user_id;
   if (!userID) {
     res.end("You are not logged in!");
+  } else {
+    let templateVars = {
+      user: users[userID],
+      urlDb: urlDatabase
+    };
+    res.render('urls_index', templateVars);
   }
-  let templateVars = {
-    user: users[userID],
-    urlDb: urlDatabase
-  };
-  res.render('urls_index', templateVars);
 });
 
 app.get("/hello", (req, res) => {
@@ -120,19 +122,20 @@ app.get("/urls/:id", (req, res) => {
   shortURL = req.params.id;
   if (!urlDatabase[shortURL]) {
     res.end("Short URL doesn't exist!");
-  }
-  let userID = req.session.user_id;
-  if (userID && urlDatabase[shortURL].userID === userID) {
-    longURL = urlDatabase[shortURL].url;
-    let userID = req.session.user_id;
-    let templateVars = {
-      user: users[userID],
-      shortURL: shortURL,
-      longURL: longURL
-    };
-    res.render("urls_show", templateVars);
   } else {
-    res.end("Either this URL doesn't belong to you, or you must log in!")
+    let userID = req.session.user_id;
+    if (userID && urlDatabase[shortURL].userID === userID) {
+      longURL = urlDatabase[shortURL].url;
+      let userID = req.session.user_id;
+      let templateVars = {
+        user: users[userID],
+        shortURL: shortURL,
+        longURL: longURL
+      };
+      res.render("urls_show", templateVars);
+    } else {
+      res.end("Either this URL doesn't belong to you, or you must log in!")
+    }
   }
 });
 
@@ -140,9 +143,10 @@ app.get("/u/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
   if (!urlDatabase[shortURL]) {
     res.end("Short URL doesn't exist!");
+  } else {
+    let longURL = urlDatabase[shortURL].url;
+    res.redirect(longURL);
   }
-  let longURL = urlDatabase[shortURL].url;
-  res.redirect(longURL);
 });
 
 app.post("/urls", (req, res) => {
@@ -202,24 +206,26 @@ app.post("/register", (req, res) => {
   let emailExists = checkExistingEmail(email);
   if (emailExists) {
     res.status(400).send("This email is already registered!");
-  }
-  if (!(req.body.password && req.body.email)) {
-    res.status(400).send("You must enter an email and a password to register!");
-  }
-  let userID = generateRandomString();
-  let password = req.body.password;
-  let passwordConfirm = req.body.password_confirm;
-  if (password === passwordConfirm) {
-    let hashedPassword = bcrypt.hashSync(password, 10);
-    users[userID] = {
-      id: userID,
-      email: email,
-      password: hashedPassword
-    };
-    req.session.user_id = userID;
-    res.redirect("/urls");
   } else {
-    res.end("Passwords don't match!");
+    if (!(req.body.password && req.body.email)) {
+      res.status(400).send("You must enter an email and a password to register!");
+    } else {
+      let userID = generateRandomString();
+      let password = req.body.password;
+      let passwordConfirm = req.body.password_confirm;
+      if (password === passwordConfirm) {
+        let hashedPassword = bcrypt.hashSync(password, 10);
+        users[userID] = {
+          id: userID,
+          email: email,
+          password: hashedPassword
+        };
+        req.session.user_id = userID;
+        res.redirect("/urls");
+      } else {
+        res.end("Passwords don't match!");
+      }
+    }
   }
 });
 
