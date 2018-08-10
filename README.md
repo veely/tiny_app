@@ -4,9 +4,9 @@ TinyApp is a full stack web application built using Node and Express. This appli
 
 ## Final Product
 
-!["New user registration page"](tiny_app/docs/register-page.png)
-!["Shows the current user's shortened URLs"](tiny_app/docs/urls-page.png)
-!["Shows the newly created URL and allows you to update it"](tiny_app/docs/show-url-page.png)
+!["New user registration page"](https://github.com/veely/tiny_app/blob/master/docs/register-page.png?raw=true)
+!["Shows the current user's shortened URLs"](https://github.com/veely/tiny_app/blob/master/docs/show-url-page.png?raw=true)
+!["Shows the newly created URL and allows you to update it"](https://github.com/veely/tiny_app/blob/master/docs/urls-page.png?raw=true)
 
 ## Dependencies
 
