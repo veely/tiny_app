@@ -69,10 +69,18 @@ app.use(cookieSession({
 app.set("view engine", "ejs");
 
 app.get("/", (req, res) => {
-  res.end("Hello!");
+  let userID = req.session.user_id;
+  if (userID) {
+    res.redirect("/urls");
+  } else {
+    res.redirect("/login");
+  }
 });
 
 app.get("/register", (req, res) => {
+  if (req.session.user_id) {
+    res.redirect("/urls");
+  }
   res.render('register');
 });
 
@@ -82,6 +90,9 @@ app.get("/login", (req, res) => {
 
 app.get("/urls", (req, res) => {
   let userID = req.session.user_id;
+  if (!userID) {
+    res.end("You are not logged in!");
+  }
   let templateVars = {
     user: users[userID],
     urlDb: urlDatabase
@@ -106,8 +117,11 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  let userID = req.session.user_id;
   shortURL = req.params.id;
+  if (!urlDatabase[shortURL]) {
+    res.end("Short URL doesn't exist!");
+  }
+  let userID = req.session.user_id;
   if (userID && urlDatabase[shortURL].userID === userID) {
     longURL = urlDatabase[shortURL].url;
     let userID = req.session.user_id;
@@ -124,11 +138,14 @@ app.get("/urls/:id", (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
+  if (!urlDatabase[shortURL]) {
+    res.end("Short URL doesn't exist!");
+  }
   let longURL = urlDatabase[shortURL].url;
   res.redirect(longURL);
 });
 
-app.post("/urls/new", (req, res) => {
+app.post("/urls", (req, res) => {
   let userID = req.session.user_id;
   let longURL = req.body.longURL;
   let shortURL = generateRandomString();
@@ -171,7 +188,7 @@ app.post("/login", (req, res) => {
     req.session.user_id = user.id;
     res.redirect("/urls");
   } else {
-    res.sendStatus(403);
+    res.status(403).send("Incorrect login information!");
   }
 });
 
@@ -183,9 +200,11 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   let email = req.body.email;
   let emailExists = checkExistingEmail(email);
-  if (emailExists || !(req.body.password && req.body.email)) {
-    // res.status(400).send('400: Bad Request!');
-    res.sendStatus(400);
+  if (emailExists) {
+    res.status(400).send("This email is already registered!");
+  }
+  if (!(req.body.password && req.body.email)) {
+    res.status(400).send("You must enter an email and a password to register!");
   }
   let userID = generateRandomString();
   let password = req.body.password;
@@ -197,8 +216,7 @@ app.post("/register", (req, res) => {
       email: email,
       password: hashedPassword
     };
-    console.log(users[userID].password);
-    res.cookie("user_id", userID);
+    req.session.user_id = userID;
     res.redirect("/urls");
   } else {
     res.end("Passwords don't match!");
